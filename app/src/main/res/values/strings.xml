@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Saúde Mental</string>
+    <string name="email_hint">Digite seu e-mail</string>
+    <string name="senha_hint">Digite sua senha</string>
+    <string name="btn_login">Entrar</string>
+    <string name="criar_conta">Criar uma conta</string>
+</resources>
