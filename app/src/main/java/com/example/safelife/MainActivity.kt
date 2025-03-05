@@ -66,16 +66,23 @@ fun AppNavigation() {
         }
     }
 
-    NavHost(navController, startDestination = "login") {
+    NavHost(navController, startDestination = if (isUserLoggedIn == true) "home" else "login") {
         composable("login") {
             LoginScreen(
-                navigateToHome = { navController.navigate("home") },
+                navigateToHome = {
+                    if (isUserLoggedIn == true) { // Verifica se realmente está logado antes de ir para a Home
+                        navController.navigate("home")
+                    }
+                },
                 navigateToSignup = { navController.navigate("signup") }
             )
         }
         composable("signup") {
-            SignupScreen(navigateToLogin = { navController.popBackStack() })
+            SignupScreen(navigateToLogin = {
+                navController.navigate("login") // Alterado para garantir que vá apenas para a tela de Login
+            })
         }
+
         composable("home") {
             HomeScreen(
                 navigateToChat = { /* Adicionar navegação para Chat */ },

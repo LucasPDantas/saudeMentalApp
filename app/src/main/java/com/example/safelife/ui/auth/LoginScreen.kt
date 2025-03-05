@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safelife.viewModel.AuthViewModel
+import androidx.compose.ui.text.input.ImeAction
 
 
 @Composable
@@ -27,54 +28,60 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToSignup: () -> Unit) {
     var password by remember { mutableStateOf("") }
 
     // Layout da tela de login
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = "Login", style = MaterialTheme.typography.headlineSmall)
-
-        // Campo de entrada para o email
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("E-mail") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
-
-        // Campo de entrada para a senha
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Senha") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botão de login
-        Button(
-            onClick = {
-                Log.d("LoginScreen", "Tentativa de login com email: $email") // Log do email digitado
-                viewModel.login(email, password, onSuccess = {
-                    Log.d("LoginScreen", "Login bem-sucedido para email: $email") // Log de sucesso
-                    navigateToHome()
-                }, onError = {
-                    Log.e("LoginScreen", "Erro ao fazer login: $it") // Log de erro
-                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                })
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(text = "Entrar")
-        }
+            Text(text = "Login", style = MaterialTheme.typography.headlineMedium)
 
-        // Botão para navegar até a tela de cadastro
-        TextButton(onClick = navigateToSignup) {
-            Text("Não tem uma conta? Cadastre-se")
-        }
-    }
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("E-mail") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    Log.d("LoginScreen", "Tentativa de login com email: $email")
+                    viewModel.login(email, password, onSuccess = {
+                        Log.d("LoginScreen", "Login bem-sucedido para email: $email")
+                        navigateToHome()
+                    }, onError = {
+                        Log.e("LoginScreen", "Erro ao fazer login: $it")
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    })
+                },
+                modifier = Modifier.fillMaxWidth().height(50.dp)
+            ) {
+                Text(text = "Entrar")
+            }
+
+            TextButton(onClick = navigateToSignup) {
+                Text("Não tem uma conta? Cadastre-se")
+            }
+        } // **Fechamento correto da Column**
+    } // **Fechamento correto da Box**
 }

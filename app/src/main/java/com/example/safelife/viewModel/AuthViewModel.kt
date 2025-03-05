@@ -79,8 +79,10 @@ class AuthViewModel : ViewModel() {
                         .addOnSuccessListener {
                             Log.d("AuthViewModel", "Usuário salvo no Realtime Database com sucesso!")
                             // Atualiza o estado do login para garantir que a navegação funcione corretamente
-                            _isUserLoggedIn.value = true
-                            _isCheckingAuth.value = false
+                            _isUserLoggedIn.postValue(true)
+                            _isCheckingAuth.postValue(false)
+
+                            Log.d("AuthViewModel", "Usuário autenticado e estado atualizado")
                             onSuccess()
                         }
                         .addOnFailureListener { e ->

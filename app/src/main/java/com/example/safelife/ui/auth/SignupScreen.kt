@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -29,121 +30,106 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
     var crp by remember { mutableStateOf("") }
     val isProfessional = userType == "Profissional"
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = "Cadastro", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(text = "Cadastro", style = MaterialTheme.typography.headlineMedium)
 
-        // Nome
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nome *") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // E-mail
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("E-mail *") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Telefone
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            label = { Text("Telefone *") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Senha
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Senha *") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Confirmar Senha
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar Senha *") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Seleção de tipo de usuário
-        Text("Selecione o tipo de usuário:")
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = userType == "Paciente", onClick = { userType = "Paciente" })
-            Text("Paciente")
-            Spacer(modifier = Modifier.width(16.dp))
-            RadioButton(selected = userType == "Profissional", onClick = { userType = "Profissional" })
-            Text("Profissional")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Campo CRP (aparece apenas se for Profissional)
-        if (isProfessional) {
             OutlinedTextField(
-                value = crp,
-                onValueChange = { crp = it },
-                label = { Text("CRP *") },
-                modifier = Modifier.fillMaxWidth()
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nome *") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("E-mail *") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+            )
 
-        // Botão de Cadastro
-        Button(
-            onClick = {
-                if (password != confirmPassword) {
-                    Toast.makeText(context, "As senhas não coincidem", Toast.LENGTH_SHORT).show()
-                } else if (isProfessional && crp.isBlank()) {
-                    Toast.makeText(context, "Profissionais precisam informar o CRP", Toast.LENGTH_SHORT).show()
-                } else {
-                    viewModel.signup(name, email, phoneNumber, userType, crp, password, onSuccess = {
-                        Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
-                        navigateToLogin()
-                    }, onError = { error ->
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                    })
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-        ) {
-            Text(text = "CONFIRMAR")
-        }
+            OutlinedTextField(
+                value = phoneNumber,
+                onValueChange = { phoneNumber = it },
+                label = { Text("Telefone *") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha *") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
+            )
 
-        // Link para login
-        TextButton(onClick = navigateToLogin) {
-            Text("Já tem uma conta? Faça login")
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirmar Senha *") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+            )
+
+            Text("Selecione o tipo de usuário:")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(selected = userType == "Paciente", onClick = { userType = "Paciente" })
+                Text("Paciente")
+                Spacer(modifier = Modifier.width(16.dp))
+                RadioButton(selected = userType == "Profissional", onClick = { userType = "Profissional" })
+                Text("Profissional")
+            }
+
+            if (isProfessional) {
+                OutlinedTextField(
+                    value = crp,
+                    onValueChange = { crp = it },
+                    label = { Text("CRP *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
+                )
+            }
+
+            Button(
+                onClick = {
+                    if (password != confirmPassword) {
+                        Toast.makeText(context, "As senhas não coincidem", Toast.LENGTH_SHORT).show()
+                    } else if (isProfessional && crp.isBlank()) {
+                        Toast.makeText(context, "Profissionais precisam informar o CRP", Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.signup(name, email, phoneNumber, userType, crp, password, onSuccess = {
+                            navigateToLogin()
+                        }, onError = { error ->
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Text("CONFIRMAR")
+            }
+
+            TextButton(onClick = navigateToLogin) {
+                Text("Já tem uma conta? Faça login")
+            }
         }
     }
 }
