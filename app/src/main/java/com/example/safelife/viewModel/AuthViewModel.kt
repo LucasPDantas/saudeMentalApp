@@ -95,6 +95,20 @@ class AuthViewModel : ViewModel() {
             }
     }
 
+    fun resetPassword(email: String, callback: (Boolean, String) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("AuthViewModel", "E-mail de redefinição de senha enviado para $email")
+                    callback(true, "E-mail de redefinição enviado para $email. Verifique sua caixa de entrada.")
+                } else {
+                    val errorMsg = task.exception?.message ?: "Erro ao enviar e-mail de redefinição"
+                    Log.e("AuthViewModel", "Erro ao redefinir senha: $errorMsg")
+                    callback(false, errorMsg)
+                }
+            }
+    }
+
 
     /**
      * Faz logout do usuário e atualiza o estado do login.

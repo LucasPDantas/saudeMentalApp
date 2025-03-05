@@ -14,19 +14,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safelife.viewModel.AuthViewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun SignupScreen(navigateToLogin: () -> Unit) {
     val viewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
 
-    // Estados para armazenar os dados do usuário
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var userType by remember { mutableStateOf("Paciente") } // Padrão: Paciente
+    var userType by remember { mutableStateOf("Paciente") }
     var crp by remember { mutableStateOf("") }
     val isProfessional = userType == "Profissional"
 
@@ -34,12 +35,12 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .verticalScroll(rememberScrollState()) // ✅ Permite rolagem se necessário
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -107,6 +108,9 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
                 )
             }
 
+            Spacer(modifier = Modifier.height(16.dp)) // ✅ Evita sobreposição
+
+            // O botão agora sempre será visível
             Button(
                 onClick = {
                     if (password != confirmPassword) {
@@ -121,7 +125,9 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
                         })
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp), // ✅ Garante que o botão seja sempre visível
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("CONFIRMAR")
@@ -133,3 +139,4 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
         }
     }
 }
+
