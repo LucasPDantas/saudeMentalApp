@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun SignupScreen(navigateToLogin: () -> Unit) {
@@ -35,7 +37,7 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
@@ -127,15 +129,16 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp), // ✅ Garante que o botão seja sempre visível
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    .height(50.dp), // ✅ Mantém o tamanho adequado
+                shape = RoundedCornerShape(12.dp), // 🔹 Mantém um leve arredondamento
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFED474A)) // 🔥 Botão agora está vermelho
             ) {
-                Text("CONFIRMAR")
+                Text("CONFIRMAR", color = Color.White) // ✅ Texto branco para melhor contraste
             }
 
-            TextButton(onClick = navigateToLogin) {
-                Text("Já tem uma conta? Faça login")
-            }
+//            TextButton(onClick = navigateToLogin) {
+//                Text("Já tem uma conta? Faça login")
+//            }
         }
     }
 }

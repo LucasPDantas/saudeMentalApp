@@ -125,22 +125,28 @@ fun LoginScreen(navigateToHome: () -> Unit, navigateToSignup: () -> Unit) {
 
             Button(
                 onClick = {
-                    Log.d("LoginScreen", "Tentativa de login com email: $email")
-                    viewModel.login(email, password, onSuccess = {
-                        Log.d("LoginScreen", "Login bem-sucedido para email: $email")
-                        navigateToHome()
-                    }, onError = {
-                        Log.e("LoginScreen", "Erro ao fazer login: $it")
-                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                    })
+                    if (email.isBlank() || password.isBlank()) {
+                        // Exibe um Toast informando que os campos são obrigatórios
+                        Toast.makeText(context, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Log.d("LoginScreen", "Tentativa de login com email: $email")
+                        viewModel.login(email, password, onSuccess = {
+                            Log.d("LoginScreen", "Login bem-sucedido para email: $email")
+                            navigateToHome()
+                        }, onError = { error ->
+                            Log.e("LoginScreen", "Erro ao fazer login: $error")
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        })
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE)) // Cor Azul do botão
             ) {
                 Text(text = "Acessar", color = Color.White)
             }
+
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 TextButton(onClick = navigateToSignup) {
