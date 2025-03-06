@@ -18,9 +18,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.graphics.Color
+import com.airbnb.lottie.compose.*
+import com.example.safelife.R
+import kotlinx.coroutines.launch
 
 @Composable
-fun SignupScreen(navigateToLogin: () -> Unit) {
+fun SignupScreen(
+    navigateToHome: () -> Unit
+) {
     val viewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
 
@@ -32,118 +37,132 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
     var userType by remember { mutableStateOf("Paciente") }
     var crp by remember { mutableStateOf("") }
     val isProfessional = userType == "Profissional"
+    var isLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
+    if (isLoading) {
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation_aviao))
+        LottieAnimation(
+            composition = composition,
+            iterations = LottieConstants.IterateForever,
+            modifier = Modifier.fillMaxSize()
+        )
+    } else {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()) // ✅ Permite rolagem se necessário
+                .fillMaxSize()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = "Cadastro", style = MaterialTheme.typography.headlineMedium)
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nome *") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
-            )
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail *") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
-            )
-
-            OutlinedTextField(
-                value = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                label = { Text("Telefone *") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next)
-            )
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Senha *") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
-            )
-
-            OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                label = { Text("Confirmar Senha *") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
-            )
-
-            Text("Selecione o tipo de usuário:")
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = userType == "Paciente", onClick = { userType = "Paciente" })
-                Text("Paciente")
-                Spacer(modifier = Modifier.width(16.dp))
-                RadioButton(selected = userType == "Profissional", onClick = { userType = "Profissional" })
-                Text("Profissional")
-            }
-
-            if (isProfessional) {
-                OutlinedTextField(
-                    value = crp,
-                    onValueChange = { crp = it },
-                    label = { Text("CRP *") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp)) // ✅ Evita sobreposição
-
-            // O botão agora sempre será visível
-            Button(
-                onClick = {
-                    // ✅ Validação antes de enviar os dados ao Firebase
-                    if (name.isBlank() || email.isBlank() || phoneNumber.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-                        Toast.makeText(context, "Todos os campos são obrigatórios.", Toast.LENGTH_SHORT).show()
-                    } else if (password != confirmPassword) {
-                        Toast.makeText(context, "As senhas não coincidem.", Toast.LENGTH_SHORT).show()
-                    } else if (isProfessional && crp.isBlank()) {
-                        Toast.makeText(context, "Profissionais precisam informar o CRP.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        viewModel.signup(
-                            name, email, phoneNumber, userType, crp, password, confirmPassword,
-                            onSuccess = { navigateToLogin() },
-                            onError = { error -> Toast.makeText(context, error, Toast.LENGTH_SHORT).show() }
-                        )
-                    }
-                },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFED474A))
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("CONFIRMAR", color = Color.White)
+                Text(text = "Cadastro", style = MaterialTheme.typography.headlineMedium)
+
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nome *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+                )
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("E-mail *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+                )
+
+                OutlinedTextField(
+                    value = phoneNumber,
+                    onValueChange = { phoneNumber = it },
+                    label = { Text("Telefone *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next)
+                )
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Senha *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
+                )
+
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirmar Senha *") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+                )
+
+                Text("Selecione o tipo de usuário:")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = userType == "Paciente", onClick = { userType = "Paciente" })
+                    Text("Paciente")
+                    Spacer(modifier = Modifier.width(16.dp))
+                    RadioButton(selected = userType == "Profissional", onClick = { userType = "Profissional" })
+                    Text("Profissional")
+                }
+
+                if (isProfessional) {
+                    OutlinedTextField(
+                        value = crp,
+                        onValueChange = { crp = it },
+                        label = { Text("CRP *") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (name.isBlank() || email.isBlank() || phoneNumber.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                            Toast.makeText(context, "Todos os campos são obrigatórios.", Toast.LENGTH_SHORT).show()
+                        } else if (password != confirmPassword) {
+                            Toast.makeText(context, "As senhas não coincidem.", Toast.LENGTH_SHORT).show()
+                        } else if (isProfessional && crp.isBlank()) {
+                            Toast.makeText(context, "Profissionais precisam informar o CRP.", Toast.LENGTH_SHORT).show()
+                        } else {
+
+                            coroutineScope.launch {
+                                isLoading = true
+//                                delay(1500)
+                                viewModel.signup(
+                                    name, email, phoneNumber, userType, crp, password, confirmPassword,
+                                    onSuccess = {
+                                        isLoading = false
+                                        navigateToHome() // Agora navega corretamente para a Home
+                                    },
+                                    onError = { error ->
+                                        isLoading = false
+                                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFED474A))
+                ) {
+                    Text("CONFIRMAR", color = Color.White)
+                }
             }
-
-
-//            TextButton(onClick = navigateToLogin) {
-//                Text("Já tem uma conta? Faça login")
-//            }
         }
     }
 }
-

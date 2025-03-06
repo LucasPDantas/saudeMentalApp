@@ -78,9 +78,13 @@ fun AppNavigation() {
             )
         }
         composable("signup") {
-            SignupScreen(navigateToLogin = {
-                navController.navigate("login") // Alterado para garantir que vá apenas para a tela de Login
-            })
+            SignupScreen(
+                navigateToHome = {  // Adicionando corretamente navigateToHome
+                    navController.navigate("home") {
+                        popUpTo("signup") { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable("home") {
