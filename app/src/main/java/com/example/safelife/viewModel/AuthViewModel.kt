@@ -59,9 +59,28 @@ class AuthViewModel : ViewModel() {
         userType: String,
         crp: String,
         password: String,
+        confirmPassword: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+        // Verifica se os campos obrigatórios estão preenchidos
+        if (name.isBlank() || email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+            onError("Todos os campos devem ser preenchidos.")
+            return
+        }
+
+        // Verifica se as senhas coincidem
+        if (password != confirmPassword) {
+            onError("As senhas não coincidem.")
+            return
+        }
+
+        // Se for profissional, verifica se o CRP foi preenchido
+        if (userType == "Profissional" && crp.isBlank()) {
+            onError("O campo CRP é obrigatório para profissionais.")
+            return
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -78,11 +97,8 @@ class AuthViewModel : ViewModel() {
                     db.child(userId).setValue(user)
                         .addOnSuccessListener {
                             Log.d("AuthViewModel", "Usuário salvo no Realtime Database com sucesso!")
-                            // Atualiza o estado do login para garantir que a navegação funcione corretamente
                             _isUserLoggedIn.postValue(true)
                             _isCheckingAuth.postValue(false)
-
-                            Log.d("AuthViewModel", "Usuário autenticado e estado atualizado")
                             onSuccess()
                         }
                         .addOnFailureListener { e ->
@@ -90,10 +106,11 @@ class AuthViewModel : ViewModel() {
                             onError(e.message ?: "Erro ao salvar no banco")
                         }
                 } else {
-                    onError(task.exception?.message ?: "Erro desconhecido")
+                    onError(task.exception?.message ?: "Erro desconhecido ao cadastrar usuário")
                 }
             }
     }
+
 
     fun resetPassword(email: String, callback: (Boolean, String) -> Unit) {
         auth.sendPasswordResetEmail(email)

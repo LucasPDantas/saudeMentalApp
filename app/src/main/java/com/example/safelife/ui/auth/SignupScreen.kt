@@ -115,26 +115,30 @@ fun SignupScreen(navigateToLogin: () -> Unit) {
             // O botão agora sempre será visível
             Button(
                 onClick = {
-                    if (password != confirmPassword) {
-                        Toast.makeText(context, "As senhas não coincidem", Toast.LENGTH_SHORT).show()
+                    // ✅ Validação antes de enviar os dados ao Firebase
+                    if (name.isBlank() || email.isBlank() || phoneNumber.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                        Toast.makeText(context, "Todos os campos são obrigatórios.", Toast.LENGTH_SHORT).show()
+                    } else if (password != confirmPassword) {
+                        Toast.makeText(context, "As senhas não coincidem.", Toast.LENGTH_SHORT).show()
                     } else if (isProfessional && crp.isBlank()) {
-                        Toast.makeText(context, "Profissionais precisam informar o CRP", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Profissionais precisam informar o CRP.", Toast.LENGTH_SHORT).show()
                     } else {
-                        viewModel.signup(name, email, phoneNumber, userType, crp, password, onSuccess = {
-                            navigateToLogin()
-                        }, onError = { error ->
-                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        })
+                        viewModel.signup(
+                            name, email, phoneNumber, userType, crp, password, confirmPassword,
+                            onSuccess = { navigateToLogin() },
+                            onError = { error -> Toast.makeText(context, error, Toast.LENGTH_SHORT).show() }
+                        )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp), // ✅ Mantém o tamanho adequado
-                shape = RoundedCornerShape(12.dp), // 🔹 Mantém um leve arredondamento
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFED474A)) // 🔥 Botão agora está vermelho
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFED474A))
             ) {
-                Text("CONFIRMAR", color = Color.White) // ✅ Texto branco para melhor contraste
+                Text("CONFIRMAR", color = Color.White)
             }
+
 
 //            TextButton(onClick = navigateToLogin) {
 //                Text("Já tem uma conta? Faça login")
