@@ -89,7 +89,8 @@ fun AppNavigation() {
 
         composable("home") {
             HomeScreen(
-                navigateToChat = { /* Adicionar navegação para Chat */ },
+                navigateToChat = { userId, recipientId ->
+                    navController.navigate("chat/$userId/$recipientId") },
                 navigateToConsultas = { /* Adicionar navegação para Consultas */ },
                 navigateToForum = { /* Adicionar navegação para Fórum */ },
                 navigateToLogin = {
@@ -101,5 +102,16 @@ fun AppNavigation() {
                 }
             )
         }
+
+        composable("chat/{userId}/{recipientId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val recipientId = backStackEntry.arguments?.getString("recipientId") ?: ""
+
+            com.example.safelife.ui.chat.ChatScreen(
+                currentUserId = userId,
+                otherUserId = recipientId
+            )
+        }
+
     }
 }

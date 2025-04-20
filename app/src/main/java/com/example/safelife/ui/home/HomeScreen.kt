@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun HomeScreen(
-    navigateToChat: () -> Unit,
+    navigateToChat: (String, String) -> Unit,
     navigateToConsultas: () -> Unit,
     navigateToForum: () -> Unit,
     navigateToLogin: () -> Unit
@@ -55,8 +55,10 @@ fun HomeScreen(
             // Botão Chat de Suporte (Amarelo)
             Button(
                 onClick = {
+                    val userId = auth.currentUser?.uid ?: return@Button
+                    val recipientId = "suporte" // ou troque pelo ID de um profissional se preferir
                     Log.d("HomeScreen", "Usuário acessou a tela de Chat")
-                    navigateToChat()
+                    navigateToChat(userId, recipientId)
                 },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFC43D)),
                 border = BorderStroke(2.dp, Color(0xFFFFC43D)),
