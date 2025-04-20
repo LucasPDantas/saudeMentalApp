@@ -29,6 +29,7 @@ fun SignupScreen(
     val viewModel: AuthViewModel = viewModel()
     val context = LocalContext.current
 
+    //campos do formulário
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -141,7 +142,13 @@ fun SignupScreen(
                                 isLoading = true
 //                                delay(1500)
                                 viewModel.signup(
-                                    name, email, phoneNumber, userType, crp, password, confirmPassword,
+                                    name = name,
+                                    email = email,
+                                    phone = phoneNumber,
+                                    userType = userType,
+                                    crp = crp,
+                                    password = password,
+                                    confirmPassword = confirmPassword,
                                     onSuccess = {
                                         isLoading = false
                                         navigateToHome() // Agora navega corretamente para a Home

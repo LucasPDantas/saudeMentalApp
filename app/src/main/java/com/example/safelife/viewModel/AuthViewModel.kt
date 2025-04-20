@@ -5,15 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 //    private val db: FirebaseFirestore = FirebaseFirestore.getInstance() // Adicionado corretamente
-    private val db: DatabaseReference = FirebaseDatabase.getInstance().getReference("users") // Banco de Dados Realtime
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance() // Banco de Dados Firestore
 
     private val _isUserLoggedIn = MutableLiveData<Boolean>()
     val isUserLoggedIn: LiveData<Boolean> = _isUserLoggedIn
@@ -76,7 +74,7 @@ class AuthViewModel : ViewModel() {
         }
 
         // Se for profissional, verifica se o CRP foi preenchido
-        if (userType == "Profissional" && crp.isBlank()) {
+        if (userType == "profissional" && crp.isBlank()) {
             onError("O campo CRP é obrigatório para profissionais.")
             return
         }
@@ -87,14 +85,15 @@ class AuthViewModel : ViewModel() {
                     val userId = task.result?.user?.uid ?: return@addOnCompleteListener
 
                     val user = hashMapOf(
+                        "uid" to userId,
                         "name" to name,
                         "email" to email,
                         "phone" to phone,
-                        "userType" to userType,
-                        "crp" to if (userType == "Profissional") crp else ""
+                        "userType" to userType.lowercase(),
+                        "crp" to if (userType == "profissional") crp else ""
                     )
 
-                    db.child(userId).setValue(user)
+                    db.collection("usuarios").document(userId).set(user)
                         .addOnSuccessListener {
                             Log.d("AuthViewModel", "Usuário salvo no Realtime Database com sucesso!")
                             _isUserLoggedIn.postValue(true)
@@ -136,6 +135,17 @@ class AuthViewModel : ViewModel() {
         _isCheckingAuth.value = false // Reinicia para permitir navegação correta
         Log.d("AuthViewModel", "Usuário deslogado")
         onLogout()
+    }
+
+    fun getUserType(userId: String, callback: (String?) -> Unit) {
+        db.collection("usuarios").document(userId).get()
+            .addOnSuccessListener { document ->
+                val tipoConta = document.getString("userType")
+                callback(tipoConta)
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
     }
 }
 

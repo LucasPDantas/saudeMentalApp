@@ -18,6 +18,7 @@ import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxSize
+import com.example.safelife.ui.chat.ListaProfissionaisScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -89,8 +90,8 @@ fun AppNavigation() {
 
         composable("home") {
             HomeScreen(
-                navigateToChat = { userId, recipientId ->
-                    navController.navigate("chat/$userId/$recipientId") },
+                navigateToListaProfissionais = { userId ->
+                    navController.navigate("lista_profissionais/$userId") },
                 navigateToConsultas = { /* Adicionar navegação para Consultas */ },
                 navigateToForum = { /* Adicionar navegação para Fórum */ },
                 navigateToLogin = {
@@ -103,15 +104,17 @@ fun AppNavigation() {
             )
         }
 
-        composable("chat/{userId}/{recipientId}") { backStackEntry ->
+        composable("lista_profissionais/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val recipientId = backStackEntry.arguments?.getString("recipientId") ?: ""
-
-            com.example.safelife.ui.chat.ChatScreen(
+            ListaProfissionaisScreen(
                 currentUserId = userId,
-                otherUserId = recipientId
+                navigateToChat = { currentUserId, recipientId ->
+                    navController.navigate("chat/$currentUserId/$recipientId")
+                }
             )
         }
+
+
 
     }
 }
