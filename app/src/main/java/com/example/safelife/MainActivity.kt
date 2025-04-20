@@ -18,6 +18,7 @@ import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxSize
+import com.example.safelife.ui.chat.ChatScreen
 import com.example.safelife.ui.chat.ListaProfissionaisScreen
 
 
@@ -114,7 +115,14 @@ fun AppNavigation() {
             )
         }
 
+        composable("chat/{currentUserId}/{recipientId}") { backStackEntry ->
+            val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
+            val recipientId = backStackEntry.arguments?.getString("recipientId") ?: ""
 
-
+            ChatScreen(
+                currentUserId = currentUserId,
+                otherUserId = recipientId
+            )
+        }
     }
 }

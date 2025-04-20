@@ -1,5 +1,6 @@
 package com.example.safelife.ui.chat
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,20 +26,27 @@ class ChatViewModel(
 
     private fun setupChat() {
         viewModelScope.launch {
-            // Obtém ou cria um ID de chat para estes dois usuários
-            chatId = chatRepository.getOrCreateChatId(currentUserId, otherUserId)
+            try {
+                chatId = chatRepository.getOrCreateChatId(currentUserId, otherUserId)
 
-            // Observa as mensagens em tempo real
-            chatRepository.observeMessages(chatId).collect { newMessages ->
-                _messages.clear()
-                _messages.addAll(newMessages)  // Atualiza a lista local
+                chatRepository.observeMessages(chatId).collect { newMessages ->
+                    _messages.clear()
+                    _messages.addAll(newMessages)
+                }
+
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "Erro ao configurar chat: ${e.message}")
             }
         }
     }
 
+
     // Envia uma nova mensagem
     fun sendMessage(text: String) {
-        if (text.isBlank()) return  // Não envia mensagens vazias
+        if (text.isBlank() || chatId.isBlank()) {
+            Log.e("ChatViewModel", "Mensagem inválida ou chatId não configurado")
+            return
+        }  // Não envia mensagens vazias
 
         viewModelScope.launch {
             val message = Message(
@@ -48,6 +56,8 @@ class ChatViewModel(
                 timestamp = System.currentTimeMillis(),  // Usa o tempo atual
                 read = false  // Inicialmente não lida
             )
+
+            Log.d("ChatViewModel", "Enviando mensagem: $message")
             chatRepository.sendMessage(chatId, message)  // Persiste no Firestore
         }
     }

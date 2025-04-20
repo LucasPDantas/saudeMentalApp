@@ -14,7 +14,7 @@ class ChatViewModelFactory(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
+        if (modelClass == ChatViewModel::class.java) {
             return ChatViewModel(currentUserId, otherUserId) as T
         }
         throw IllegalArgumentException("Classe desconhecida para ViewModel")

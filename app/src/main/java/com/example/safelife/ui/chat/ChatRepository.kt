@@ -14,17 +14,18 @@ class ChatRepository {
 
     // Obtém ou cria um ID de chat para dois usuários
     suspend fun getOrCreateChatId(user1: String, user2: String): String {
-        // 1. Primeiro verifica se já existe um chat entre esses usuários
-        val query = db.collection("chats")
+        // Primeiro verifica se já existe um chat entre esses usuários
+        val snapshot = db.collection("chats")
             .whereArrayContains("participants", user1)
-            .whereArrayContains("participants", user2)
-            .limit(1)
+            .get()
+            .await()
 
-        val snapshot = query.get().await()
-
-        // Se existir, retorna o ID existente
-        if (!snapshot.isEmpty) {
-            return snapshot.documents[0].id
+        // Verifica se já existe um chat com ambos os participantes
+        for (doc in snapshot.documents) {
+            val participants = doc.get("participants") as? List<*>
+            if (participants != null && participants.contains(user2)) {
+                return doc.id
+            }
         }
 
         // Se não existir, cria um novo chat
