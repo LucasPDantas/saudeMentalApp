@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun HomeScreen(
     navigateToListaProfissionais: (String) -> Unit,
+    navigateToListaPacientes: (String) -> Unit,
     navigateToConsultas: () -> Unit,
     navigateToForum: () -> Unit,
     navigateToLogin: () -> Unit
@@ -56,8 +57,21 @@ fun HomeScreen(
             Button(
                 onClick = {
                     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@Button
-                    Log.d("HomeScreen",  "UID: $userId")
-                    navigateToListaProfissionais(userId)
+
+                    // Aqui você decide com base no tipo de usuário
+                    val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    firestore.collection("usuarios").document(userId)
+                        .get()
+                        .addOnSuccessListener { doc ->
+                            val tipo = doc.getString("userType")?.lowercase()
+                            Log.d("HomeScreen", "Usuário logado como: $tipo")
+
+                            if (tipo == "profissional") {
+                                navigateToListaPacientes(userId)
+                            } else {
+                                navigateToListaProfissionais(userId)
+                            }
+                        }
                 },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFC43D)),
                 border = BorderStroke(2.dp, Color(0xFFFFC43D)),

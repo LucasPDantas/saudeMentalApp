@@ -1,14 +1,14 @@
-package com.example.safelife.ui.chat
+package com.example.safelife.viewModel.chat.paciente
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.safelife.model.Message
-import kotlinx.coroutines.flow.collect
+import com.example.safelife.repository.ChatRepository
 import kotlinx.coroutines.launch
 
-class ChatViewModel(
+class ChatPacienteViewModel(
     private val currentUserId: String,   // ID do usuário atual
     private val otherUserId: String,    // ID do outro usuário
     private val chatRepository: ChatRepository = ChatRepository()

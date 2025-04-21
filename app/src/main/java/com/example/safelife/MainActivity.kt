@@ -18,8 +18,10 @@ import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxSize
-import com.example.safelife.ui.chat.ChatScreen
-import com.example.safelife.ui.chat.ListaProfissionaisScreen
+import com.example.safelife.ui.chat.paciente.ChatScreen
+import com.example.safelife.ui.chat.paciente.ListaProfissionaisScreen
+import com.example.safelife.ui.chat.profissional.ChatProfissionalScreen
+import com.example.safelife.ui.chat.profissional.ListaPacientesScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -92,7 +94,11 @@ fun AppNavigation() {
         composable("home") {
             HomeScreen(
                 navigateToListaProfissionais = { userId ->
-                    navController.navigate("lista_profissionais/$userId") },
+                    navController.navigate("lista_profissionais/$userId")
+                },
+                navigateToListaPacientes = { userId ->
+                    navController.navigate("lista_pacientes/$userId")
+                },
                 navigateToConsultas = { /* Adicionar navegação para Consultas */ },
                 navigateToForum = { /* Adicionar navegação para Fórum */ },
                 navigateToLogin = {
@@ -124,5 +130,24 @@ fun AppNavigation() {
                 otherUserId = recipientId
             )
         }
+
+        composable("lista_pacientes/{profissionalId}") { backStackEntry ->
+            val profissionalId = backStackEntry.arguments?.getString("profissionalId") ?: ""
+            ListaPacientesScreen(
+                navController = navController,
+                profissionalId = profissionalId
+            )
+        }
+
+        composable("chat_profissional/{profissionalId}/{pacienteId}") { backStackEntry ->
+            val profissionalId = backStackEntry.arguments?.getString("profissionalId") ?: ""
+            val pacienteId = backStackEntry.arguments?.getString("pacienteId") ?: ""
+
+            ChatProfissionalScreen(
+                profissionalId = profissionalId,
+                pacienteId = pacienteId
+            )
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.example.safelife.ui.chat
+package com.example.safelife.ui.chat.paciente
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,13 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safelife.model.Message
+import com.example.safelife.viewModel.chat.paciente.ChatPacienteViewModel
+import com.example.safelife.viewModel.chat.paciente.ChatPacienteViewModelFactory
 
 
 @Composable
 fun ChatScreen(
     currentUserId: String,
     otherUserId: String,
-    viewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(currentUserId, otherUserId))
+    viewModel: ChatPacienteViewModel = viewModel(factory = ChatPacienteViewModelFactory(currentUserId, otherUserId))
 ) {
     val messages = viewModel.messages
     var messageText by remember { mutableStateOf("") }

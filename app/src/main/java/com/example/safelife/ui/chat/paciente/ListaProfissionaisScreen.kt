@@ -1,4 +1,4 @@
-package com.example.safelife.ui.chat
+package com.example.safelife.ui.chat.paciente
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

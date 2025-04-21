@@ -1,4 +1,4 @@
-package com.example.safelife.ui.chat
+package com.example.safelife.repository
 
 import com.example.safelife.model.Message
 import com.google.firebase.firestore.FirebaseFirestore
