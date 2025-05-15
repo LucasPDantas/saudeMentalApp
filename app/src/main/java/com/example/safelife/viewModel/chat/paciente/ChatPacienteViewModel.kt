@@ -53,7 +53,7 @@ class ChatPacienteViewModel(
                 senderId = currentUserId,
                 receiverId = otherUserId,
                 text = text,
-                timestamp = System.currentTimeMillis(),  // Usa o tempo atual
+                timestamp = null, // ✅ será definido automaticamente pelo Firestore
                 read = false  // Inicialmente não lida
             )
 

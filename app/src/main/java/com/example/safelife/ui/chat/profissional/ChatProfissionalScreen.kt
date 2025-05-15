@@ -50,7 +50,12 @@ fun ChatProfissionalScreen(
         }
     }
 
-    val mensagensOrdenadas = mensagens.sortedBy { it.timestamp }.reversed()
+//    val mensagensOrdenadas = mensagens.sortedBy { it.timestamp }.reversed()
+    val mensagensOrdenadas = mensagens
+        .filter { it.timestamp != null }
+        .sortedBy { it.timestamp }
+        .reversed()
+
 
     Box(
         modifier = Modifier
@@ -67,7 +72,7 @@ fun ChatProfissionalScreen(
                     .padding(vertical = 16.dp)
             )
 
-//            val mensagensOrdenadas = mensagens.reversed()
+
 
             LazyColumn(
                 state = listState,

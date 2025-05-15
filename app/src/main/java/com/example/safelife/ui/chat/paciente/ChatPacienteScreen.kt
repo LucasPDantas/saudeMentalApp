@@ -45,7 +45,12 @@ fun ChatScreen(
         }
     }
 
-    val mensagensOrdenadas = messages.sortedBy { it.timestamp }.reversed()
+//    val mensagensOrdenadas = messages.sortedBy { it.timestamp }.reversed()
+    val mensagensOrdenadas = messages
+        .filter { it.timestamp != null }
+        .sortedBy { it.timestamp }
+        .reversed()
+
 
     // Corrigir comportamento do teclado
     Box(
@@ -54,7 +59,7 @@ fun ChatScreen(
             .padding(bottom = WindowInsets.ime.asPaddingValues().calculateBottomPadding())
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-//            val mensagensOrdenadas = messages.reversed()
+
 
             LazyColumn(
                 state = listState,

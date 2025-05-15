@@ -8,6 +8,6 @@ data class Message(
     val senderId: String = "",      // ID de quem enviou a mensagem
     val receiverId: String = "",    // ID de quem recebeu a mensagem
     val text: String = "",          // Conteúdo textual da mensagem
-    val timestamp: Long = 0L,       // Momento em que a mensagem foi enviada (em milissegundos)
+    val timestamp: com.google.firebase.Timestamp? = null,       // Momento em que a mensagem foi enviada (em milissegundos)
     val read: Boolean = false       // Indica se a mensagem foi lida ou não
 )

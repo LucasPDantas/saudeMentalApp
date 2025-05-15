@@ -45,7 +45,7 @@ class ChatProfissionalViewModel(
             senderId = profissionalId,
             receiverId = pacienteId,
             text = texto,
-            timestamp = System.currentTimeMillis(),
+            timestamp = null,
             read = false
         )
 

@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.FieldValue
 
 class ChatRepository {
     private val db: FirebaseFirestore = Firebase.firestore  // Instância do Firestore
@@ -50,8 +51,14 @@ class ChatRepository {
 
                 // Converte os documentos para objetos Message
                 val messages = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(Message::class.java)
+                    try {
+                        val msg = doc.toObject(Message::class.java)
+                        if (msg?.timestamp != null) msg else null
+                    } catch (e: Exception) {
+                        null
+                    }
                 } ?: emptyList()
+
 
                 trySend(messages)  // Envia as mensagens pelo Flow
             }
@@ -62,8 +69,16 @@ class ChatRepository {
 
     // Envia uma mensagem para o Firestore
     suspend fun sendMessage(chatId: String, message: Message) {
+        val firebaseMessage = hashMapOf(
+            "senderId" to message.senderId,
+            "receiverId" to message.receiverId,
+            "text" to message.text,
+            "timestamp" to FieldValue.serverTimestamp(), // ✅ aqui o timestamp será definido pelo Firestore
+            "read" to message.read
+        )
+
         db.collection("chats/$chatId/messages")
-            .add(message)  // Adiciona novo documento
-            .await()       // Espera a operação completar
+            .add(firebaseMessage)
+            .await()
+        }
     }
-}
