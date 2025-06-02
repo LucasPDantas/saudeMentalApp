@@ -22,6 +22,8 @@ import com.example.safelife.ui.chat.paciente.ChatScreen
 import com.example.safelife.ui.chat.paciente.ListaProfissionaisScreen
 import com.example.safelife.ui.chat.profissional.ChatProfissionalScreen
 import com.example.safelife.ui.chat.profissional.ListaPacientesScreen
+import com.example.safelife.ui.agendamento.profissional.AgendaProfissionalScreen
+import com.example.safelife.ui.agendamento.profissional.AgendamentosConfirmadosScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -99,7 +101,7 @@ fun AppNavigation() {
                 navigateToListaPacientes = { userId ->
                     navController.navigate("lista_pacientes/$userId")
                 },
-                navigateToConsultas = { /* Adicionar navegação para Consultas */ },
+                navigateToConsultas = { navController.navigate("agendaProfissional") },
                 navigateToForum = { /* Adicionar navegação para Fórum */ },
                 navigateToLogin = {
                     authViewModel.logout {
@@ -149,5 +151,16 @@ fun AppNavigation() {
             )
         }
 
+        composable("agendaProfissional") {
+            AgendaProfissionalScreen(navController = navController)
+        }
+
+        composable("agendamentosConfirmados") {
+            AgendamentosConfirmadosScreen(
+                onAbrirChat = { pacienteId ->
+                    navController.navigate("chat_profissional/profissionalId/$pacienteId")
+                }
+            )
+        }
     }
 }

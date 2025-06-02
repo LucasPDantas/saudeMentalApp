@@ -50,7 +50,7 @@ fun HomeScreen(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth().height(55.dp) // ✅ Ajustado para manter proporção correta
             ) {
-                Text(text = "Agendar Consulta", color = Color(0xFF616161))
+                Text(text = "Agendamentos", color = Color(0xFF616161))
             }
 
             // Botão Chat de Suporte (Amarelo)
