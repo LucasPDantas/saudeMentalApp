@@ -27,7 +27,11 @@ class ChatPacienteViewModel(
     private fun setupChat() {
         viewModelScope.launch {
             try {
-                chatId = chatRepository.getOrCreateChatId(currentUserId, otherUserId)
+                chatId = chatRepository.getOrCreateChatId(
+                    user1 = currentUserId,
+                    user2 = otherUserId,
+                    userType = "paciente"
+                )
 
                 chatRepository.observeMessages(chatId).collect { newMessages ->
                     _messages.clear()

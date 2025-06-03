@@ -18,13 +18,19 @@ import androidx.navigation.NavController
 import com.example.safelife.viewModel.agendamento.profissional.AgendaProfissionalViewModel
 import java.util.*
 import kotlinx.coroutines.launch
+import com.example.safelife.ui.agendamento.profissional.componentes.HorarioSelector
 
 
 @Composable
 fun AgendaProfissionalScreen(
     navController: NavController,
+    profissionalId: String,
     viewModel: AgendaProfissionalViewModel = viewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.salvarDadosProfissionalNoFirestore()
+    }
+
     val coroutineScope = rememberCoroutineScope()
     val edicoesPendentes = remember { mutableStateOf<Map<String, Set<String>>>(emptyMap()) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -76,40 +82,15 @@ fun AgendaProfissionalScreen(
             )
 
             // Grade de horários
-            Column {
-                horarios.chunked(4).forEach { linha ->
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        linha.forEach { hora ->
-                            val selecionado = hora in horariosSelecionados
-                            OutlinedButton(
-                                onClick = {
-                                    val novoSet = if (selecionado)
-                                        horariosSelecionados - hora
-                                    else
-                                        horariosSelecionados + hora
+            HorarioSelector(
+                diaSelecionado = diaSelecionado!!,
+                horarios = horarios,
+                horariosSelecionados = horariosSelecionados,
+                onChange = { horariosSelecionados = it },
+                viewModel = viewModel,
+                edicoesPendentes = edicoesPendentes
+            )
 
-                                    horariosSelecionados = novoSet
-
-                                    // Atualiza as edições pendentes
-                                    diaSelecionado?.let { dia ->
-                                        val atual = edicoesPendentes.value.toMutableMap()
-                                        atual[dia] = novoSet
-                                        edicoesPendentes.value = atual
-                                    }
-                                },
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = if (selecionado) Color(0xFF06D6A0) else Color.Transparent
-                                ),
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .weight(1f)
-                            ) {
-                                Text(hora, color = Color.Black)
-                            }
-                        }
-                    }
-                }
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,7 +100,13 @@ fun AgendaProfissionalScreen(
                     edicoesPendentes.value.forEach { (dia, horarios) ->
                         viewModel.salvarHorarios(dia, horarios)
                     }
-                    println("Todas as alterações foram salvas: ${edicoesPendentes.value}")
+
+                    // Salva apenas os horários
+                    viewModel.atualizarHorariosNoFirestore(viewModel.disponibilidade.value)
+
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Disponibilidade salva com sucesso no Firebase")
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

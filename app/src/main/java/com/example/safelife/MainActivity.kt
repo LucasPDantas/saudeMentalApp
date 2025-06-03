@@ -18,12 +18,15 @@ import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxSize
+import com.example.safelife.repository.ChatRepository
 import com.example.safelife.ui.chat.paciente.ChatScreen
 import com.example.safelife.ui.chat.paciente.ListaProfissionaisScreen
 import com.example.safelife.ui.chat.profissional.ChatProfissionalScreen
 import com.example.safelife.ui.chat.profissional.ListaPacientesScreen
 import com.example.safelife.ui.agendamento.profissional.AgendaProfissionalScreen
 import com.example.safelife.ui.agendamento.profissional.AgendamentosConfirmadosScreen
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -141,26 +144,51 @@ fun AppNavigation() {
             )
         }
 
-        composable("chat_profissional/{profissionalId}/{pacienteId}") { backStackEntry ->
+        composable("chat_profissional/{profissionalId}/{pacienteId}/{agendamentoId}") { backStackEntry ->
             val profissionalId = backStackEntry.arguments?.getString("profissionalId") ?: ""
             val pacienteId = backStackEntry.arguments?.getString("pacienteId") ?: ""
+            val agendamentoId = backStackEntry.arguments?.getString("agendamentoId") ?: ""
 
             ChatProfissionalScreen(
                 profissionalId = profissionalId,
-                pacienteId = pacienteId
+                pacienteId = pacienteId,
+                agendamentoId = agendamentoId
             )
         }
 
         composable("agendaProfissional") {
-            AgendaProfissionalScreen(navController = navController)
+            val profissionalUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+            AgendaProfissionalScreen(
+                navController = navController,
+                profissionalId = profissionalUid
+            )
         }
 
+
         composable("agendamentosConfirmados") {
+            val coroutineScope = rememberCoroutineScope()
+            val profissionalUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
             AgendamentosConfirmadosScreen(
-                onAbrirChat = { pacienteId ->
-                    navController.navigate("chat_profissional/profissionalId/$pacienteId")
+                onAbrirChat = { pacienteId, agendamentoId, userType ->
+                    coroutineScope.launch {
+                        try {
+                            val chatRepository = ChatRepository()
+                            val chatId = chatRepository.getOrCreateChatId(
+                                user1 = profissionalUid,
+                                user2 = pacienteId,
+                                userType = userType,
+                                agendamentoId = agendamentoId
+                            )
+                            navController.navigate("chat_profissional/$profissionalUid/$pacienteId/$agendamentoId")
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             )
         }
+
     }
 }

@@ -13,7 +13,7 @@ import com.example.safelife.viewModel.agendamento.profissional.Agendamento
 
 @Composable
 fun AgendamentosConfirmadosScreen(
-    onAbrirChat: (String) -> Unit,
+    onAbrirChat: (pacienteId: String, agendamentoId: String, userType: String) -> Unit,
     viewModel: AgendamentosConfirmadosViewModel = viewModel()
 ) {
     val agendamentos by viewModel.agendamentos.collectAsState()
@@ -34,10 +34,17 @@ fun AgendamentosConfirmadosScreen(
                     Text("📱 ${agendamento.telefonePaciente}")
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
-                        onClick = { onAbrirChat(agendamento.pacienteId) }
+                        onClick = {
+                            onAbrirChat(
+                                agendamento.pacienteId,
+                                agendamento.agendamentoId,
+                                "profissional"
+                            )
+                        }
                     ) {
                         Text("Abrir Chat")
                     }
+
                 }
             }
         }

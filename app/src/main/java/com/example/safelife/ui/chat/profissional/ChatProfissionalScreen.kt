@@ -24,10 +24,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatProfissionalScreen(
     profissionalId: String,
-    pacienteId: String
+    pacienteId: String,
+    agendamentoId: String
 ) {
     val viewModel: ChatProfissionalViewModel = viewModel(
-        factory = ChatProfissionalViewModelFactory(profissionalId, pacienteId)
+        factory = ChatProfissionalViewModelFactory(profissionalId, pacienteId, agendamentoId)
     )
 
     val mensagens by viewModel.mensagens.collectAsState()

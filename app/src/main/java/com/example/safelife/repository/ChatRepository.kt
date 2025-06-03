@@ -13,15 +13,17 @@ import com.google.firebase.firestore.FieldValue
 class ChatRepository {
     private val db: FirebaseFirestore = Firebase.firestore  // Instância do Firestore
 
-    // Obtém ou cria um ID de chat para dois usuários
-    suspend fun getOrCreateChatId(user1: String, user2: String): String {
-        // Primeiro verifica se já existe um chat entre esses usuários
+    suspend fun getOrCreateChatId(
+        user1: String,
+        user2: String,
+        userType: String, // "paciente" ou "profissional"
+        agendamentoId: String? = null
+    ): String {
         val snapshot = db.collection("chats")
             .whereArrayContains("participants", user1)
             .get()
             .await()
 
-        // Verifica se já existe um chat com ambos os participantes
         for (doc in snapshot.documents) {
             val participants = doc.get("participants") as? List<*>
             if (participants != null && participants.contains(user2)) {
@@ -29,15 +31,36 @@ class ChatRepository {
             }
         }
 
-        // Se não existir, cria um novo chat
+        // Lógica extra de segurança para profissionais: exige agendamentoId
+        if (userType == "profissional") {
+            if (agendamentoId == null) {
+                throw IllegalArgumentException("Profissional não pode criar chat sem agendamentoId.")
+            }
+
+            // Verifica se o agendamento realmente existe
+            val agendamentoDoc = db.collection("agendamentos")
+                .document(agendamentoId)
+                .get()
+                .await()
+
+            if (!agendamentoDoc.exists()) {
+                throw IllegalStateException("Agendamento não encontrado para criação de chat.")
+            }
+        }
+
         val newChat = hashMapOf(
             "participants" to listOf(user1, user2),
             "createdAt" to System.currentTimeMillis()
-        )
+        ).apply {
+            if (userType == "profissional" && agendamentoId != null) {
+                this["agendamentoId"] = agendamentoId
+            }
+        }
 
         val docRef = db.collection("chats").add(newChat).await()
         return docRef.id
     }
+
 
     // Observa mensagens em tempo real usando Flow
     fun observeMessages(chatId: String): Flow<List<Message>> = callbackFlow {
