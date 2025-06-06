@@ -1,6 +1,7 @@
 package com.example.safelife
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -12,13 +13,13 @@ import androidx.navigation.compose.*
 import com.example.safelife.ui.auth.LoginScreen
 import com.example.safelife.ui.auth.SignupScreen
 import com.example.safelife.ui.home.HomeScreen
-//import com.example.safelife.viewmodel.AuthViewModel
 import com.example.safelife.ui.theme.SafeLifeTheme
 import com.example.safelife.viewModel.AuthViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxSize
 import com.example.safelife.repository.ChatRepository
+import com.example.safelife.ui.agendamento.paciente.AgendamentoPacienteScreen
 import com.example.safelife.ui.chat.paciente.ChatScreen
 import com.example.safelife.ui.chat.paciente.ListaProfissionaisScreen
 import com.example.safelife.ui.chat.profissional.ChatProfissionalScreen
@@ -27,6 +28,7 @@ import com.example.safelife.ui.agendamento.profissional.AgendaProfissionalScreen
 import com.example.safelife.ui.agendamento.profissional.AgendamentosConfirmadosScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class MainActivity : ComponentActivity() {
@@ -104,7 +106,28 @@ fun AppNavigation() {
                 navigateToListaPacientes = { userId ->
                     navController.navigate("lista_pacientes/$userId")
                 },
-                navigateToConsultas = { navController.navigate("agendaProfissional") },
+                navigateToConsultas = {
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                    if (userId == null) return@HomeScreen
+
+
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("usuarios").document(userId).get()
+                        .addOnSuccessListener { document ->
+                            val tipo = document.getString("userType")
+                            if (tipo == "profissional") {
+                                navController.navigate("agendaProfissional")
+                            } else if (tipo == "paciente") {
+                                navController.navigate("agendamentoPaciente")
+                            } else {
+                                Log.e("SafeLife", "Tipo de usuário inválido ou não encontrado.")
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("SafeLife", "Erro ao buscar tipo de usuário", e)
+                        }
+
+                },
                 navigateToForum = { /* Adicionar navegação para Fórum */ },
                 navigateToLogin = {
                     authViewModel.logout {
@@ -188,6 +211,10 @@ fun AppNavigation() {
                     }
                 }
             )
+        }
+
+        composable("agendamentoPaciente") {
+            AgendamentoPacienteScreen(navController = navController)
         }
 
     }
